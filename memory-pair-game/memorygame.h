@@ -2,6 +2,7 @@
 #define MEMORYGAME_H
 
 #include <QMainWindow>
+#include <vector>
 
 namespace Ui {
 class memorygame;
@@ -17,6 +18,11 @@ public:
 
 private:
     Ui::memorygame *ui;
+
+private slots:
+    void buttonClicked();
+    void resetClicked();
+
 };
 
 #endif // MEMORYGAME_H
