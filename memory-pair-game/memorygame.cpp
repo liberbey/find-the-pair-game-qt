@@ -12,98 +12,93 @@ gameStatus status = FIRST_PICK;
 void resetTable();
 QPushButton* firstPickedButton;
 QPushButton *buttons[4][6];
-int pairs = 0;
-int tries = 0;
+int pairs = 0; // num of pairs
+int tries = 0; // num of tries
 
-
+// constructor
 memorygame::memorygame(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::memorygame)
 {
     ui->setupUi(this);
 
-    resetTable(); // Global olarak tanimladigim table degiskenini resetliyor, butonlara dokunmuyor.
+    resetTable(); // Resets the table
 
-    for(unsigned int i = 0; i < 4; i++){
+    for(unsigned int i = 0; i < 4; i++){ // 4 x 6 table
         for(unsigned int j = 0; j < 6; j++){
-            QString buttonName = "pushButton_" + QString::number(i) + QString::number(j); // Butonları ismine göre bulup sonra eşlenen yere koyuyoruz.
+            QString buttonName = "pushButton_" + QString::number(i) + QString::number(j); // Finds the buttons according to their names and put them to their places
             QPushButton* button = this->findChild<QPushButton *>(buttonName);
             buttons[i][j] = button;
             button->setText("");
-            connect(button, SIGNAL(released()), this, SLOT(buttonClicked()));  //tüm butonları aynı fonksiyona bağladım. birine tıklanınca buttonClicked() çalışacak.
+            connect(button, SIGNAL(released()), this, SLOT(buttonClicked()));  // Buttons are connected to buttonClicked() function
         }
     }
 
-    QPushButton* resetButton = this->findChild<QPushButton *>("ResetButton"); // reset butonu.
-    connect(resetButton, SIGNAL(released()), this, SLOT(resetClicked()));   // bunun fonksiyonu ayrı, bunu yazmadım daha.
+    QPushButton* resetButton = this->findChild<QPushButton *>("ResetButton"); // the reset button
+    connect(resetButton, SIGNAL(released()), this, SLOT(resetClicked()));   // connect the reset button to its function
 }
 
-void memorygame::buttonClicked(){   // reset butonu hariç bir butona tıklanınca buraya giriyor.
+// if any button other then reset is clicked, this function is called
+void memorygame::buttonClicked(){   
 
-    QPushButton* button = (QPushButton *)sender(); // tıklanılan butonu buluyor.
+    QPushButton* button = (QPushButton *)sender(); // finds the button which is clicked
 
-    if(status == FIRST_PICK){
+    if(status == FIRST_PICK){ // if it is the first one that is clicked
 
         firstPickedButton = button;
 
-        // butonun içine yazılması gereken değeri table'dan bulup içine yazıyor.
+        // finds the corresponding char that should be written inside the button
         button->setText(QChar(table[firstPickedButton->objectName().at(11).digitValue()][firstPickedButton->objectName().at(12).digitValue()]));
 
-        status = SECOND_PICK;
+        status = SECOND_PICK; // change the status
 
-    }else { // SECOND_PICK İSE
-
+    }else { // SECOND_PICK
+        
+        // char of the second button
         QChar secondPickedLetter = QChar(table[button->objectName().at(11).digitValue()][button->objectName().at(12).digitValue()]);
 
-        // İki butonun içindeki değeri table'dan bulup karşılaştırıyor. Aynı ise butonları siliyor. Farklı ise butonların textini siliyor, yani kartı kapatıyor.
+        
+        // if the char at the FIRST_PICK and SECOND_PICK are the same and the two buttons are note same
         if(firstPickedButton->text() == secondPickedLetter && firstPickedButton != button){
             tries += 1;
-            pairs += 1;
+            pairs += 1; // increment tries and pairs
             ui->lcdNumber->display(tries);
-
-            ui->lcdNumber_2->display(pairs);
-            //WAIT
-
-            // WAIT icin bunu kullanabiliriz, ama beceremedim. --> QTimer::singleShot(200, this, SLOT(updateCaption()));
-            button->setText(secondPickedLetter);
-            QTest::qWait(200);
-
+            ui->lcdNumber_2->display(pairs); // displar them     
+            button->setText(secondPickedLetter); // show the char of the card
+            QTest::qWait(200); // wait
             firstPickedButton->setEnabled(0);
-            button->setEnabled(0);
+            button->setEnabled(0); // take the cards out of the game
             remainingCards -= 2;
 
 
         }else {
 
-            tries +=1;
-            ui->lcdNumber->display(tries);
-
-            button->setText(secondPickedLetter);
-            QTest::qWait(200);
-            //QTimer::singleShot(1000, []{});
-            button->setText("");
-            firstPickedButton->setText("");
+            tries +=1; // increment tries
+            ui->lcdNumber->display(tries); // display it
+            button->setText(secondPickedLetter); // show the char of the card
+            QTest::qWait(200); // wait          
+            button->setText(""); // close the card
+            firstPickedButton->setText(""); // close the first card
 
 
         }
         status = FIRST_PICK;
     }
 }
-
-void memorygame::resetClicked(){
-
+// this function is called when reset is clicked
+void memorygame::resetClicked(){ 
+    // reset the table, pairs and tries
     resetTable();
     pairs = 0;
     tries = 0;
-    ui->lcdNumber->display(tries);
-
+    ui->lcdNumber->display(tries); // update the lcds
     ui->lcdNumber_2->display(pairs);
 
-    // Kartları 3 saniye göster, WAIT.
+    
 
     for(unsigned int i = 0; i < 4; i++){
         for(unsigned int j = 0; j < 6; j++){
-            buttons[i][j]->setDisabled(0);
+            buttons[i][j]->setDisabled(0); // sets all buttons to their initial states
             buttons[i][j]->setText("");
         }
     }
@@ -112,7 +107,7 @@ void memorygame::resetClicked(){
 }
 
 
-
+// deconstructor
 memorygame::~memorygame()
 {
     delete ui;
@@ -140,6 +135,7 @@ std::pair<std::pair<int, int>, char> randomChar(std::vector<char>& charVector, s
     return std::pair<std::pair<int, int>, char>(first, second);
 }
 
+// function that resets the table
 void resetTable(){
     srand(time(0));
     table.clear();
