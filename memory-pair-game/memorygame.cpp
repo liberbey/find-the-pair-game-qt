@@ -8,8 +8,8 @@ int remainingCards = 24;
 std::vector< std::vector<char> > table;
 gameStatus status = FIRST_PICK;
 void resetTable();
-QString firstPickedLetter;
 QPushButton* firstPickedButton;
+
 
 memorygame::memorygame(QWidget *parent) :
     QMainWindow(parent),
@@ -18,13 +18,16 @@ memorygame::memorygame(QWidget *parent) :
     ui->setupUi(this);
 
     QPushButton *buttons[4][6];
+
+    //QTimer::singleShot(200, this, SLOT(updateCaption()));
+
     resetTable();
 
     for(unsigned int i = 0; i < 4; i++){
         for(unsigned int j = 0; j < 6; j++){
             QString buttonName = "pushButton_" + QString::number(i) + QString::number(j);
             buttons[i][j] = this->findChild<QPushButton *>(buttonName);
-            buttons[i][j]->setText(QChar(table[i][j]));
+            buttons[i][j]->setText("");
 
             connect(buttons[i][j], SIGNAL(released()), this, SLOT(buttonClicked()));
         }
@@ -37,19 +40,31 @@ memorygame::memorygame(QWidget *parent) :
 void memorygame::buttonClicked(){
 
     QPushButton* button = (QPushButton *)sender();
+
     if(status == FIRST_PICK){
-        firstPickedLetter = button->text();
+
         firstPickedButton = button;
-        button->setText("");
+        button->setText(QChar(table[firstPickedButton->objectName().at(11).digitValue()][firstPickedButton->objectName().at(12).digitValue()]));
         status = SECOND_PICK;
+
     }else {
-        if(firstPickedLetter == button->text()){
+
+        QChar secondPickedLetter = QChar(table[button->objectName().at(11).digitValue()][button->objectName().at(12).digitValue()]);
+
+        if(firstPickedButton->text() == secondPickedLetter && firstPickedButton != button){
+
+            //wait
             firstPickedButton->hide();
             button->hide();
             remainingCards -= 2;
+
         }else {
-            firstPickedButton->setText("OLD");
-            button->setText("OLD");
+
+            button->setText(secondPickedLetter);
+            //wait
+            button->setText("");
+            firstPickedButton->setText("");
+
         }
         status = FIRST_PICK;
     }
