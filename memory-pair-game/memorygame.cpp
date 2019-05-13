@@ -39,7 +39,7 @@ memorygame::memorygame(QWidget *parent) :
 }
 
 // if any button other then reset is clicked, this function is called
-void memorygame::buttonClicked(){   
+void memorygame::buttonClicked(){
 
     QPushButton* button = (QPushButton *)sender(); // finds the button which is clicked
 
@@ -53,17 +53,17 @@ void memorygame::buttonClicked(){
         status = SECOND_PICK; // change the status
 
     }else { // SECOND_PICK
-        
+
         // char of the second button
         QChar secondPickedLetter = QChar(table[button->objectName().at(11).digitValue()][button->objectName().at(12).digitValue()]);
 
-        
+
         // if the char at the FIRST_PICK and SECOND_PICK are the same and the two buttons are note same
         if(firstPickedButton->text() == secondPickedLetter && firstPickedButton != button){
             tries += 1;
             pairs += 1; // increment tries and pairs
             ui->lcdNumber->display(tries);
-            ui->lcdNumber_2->display(pairs); // displar them     
+            ui->lcdNumber_2->display(pairs); // displar them
             button->setText(secondPickedLetter); // show the char of the card
             QTest::qWait(200); // wait
             firstPickedButton->setEnabled(0);
@@ -76,7 +76,7 @@ void memorygame::buttonClicked(){
             tries +=1; // increment tries
             ui->lcdNumber->display(tries); // display it
             button->setText(secondPickedLetter); // show the char of the card
-            QTest::qWait(200); // wait          
+            QTest::qWait(200); // wait
             button->setText(""); // close the card
             firstPickedButton->setText(""); // close the first card
 
@@ -86,7 +86,7 @@ void memorygame::buttonClicked(){
     }
 }
 // this function is called when reset is clicked
-void memorygame::resetClicked(){ 
+void memorygame::resetClicked(){
     // reset the table, pairs and tries
     resetTable();
     pairs = 0;
@@ -94,7 +94,7 @@ void memorygame::resetClicked(){
     ui->lcdNumber->display(tries); // update the lcds
     ui->lcdNumber_2->display(pairs);
 
-    
+
 
     for(unsigned int i = 0; i < 4; i++){
         for(unsigned int j = 0; j < 6; j++){
@@ -114,17 +114,22 @@ memorygame::~memorygame()
 }
 
 
-
+// It returns a randomly choosen char from charVector and 2 randomly choosen integer from intVector.
 std::pair<std::pair<int, int>, char> randomChar(std::vector<char>& charVector, std::vector<int>& intVector){
     srand(time(0));
+
+    // Choose the first random integer
     int randCharIndex = rand()%charVector.size();
     char randChar = charVector[randCharIndex];
+    // Remove the choosen integer from the vector so that it cannot be choosen again.
     charVector.erase(charVector.begin() + randCharIndex);
 
+    // Choose the second random integer. Same steps with the first one.
     int randIntIndex1 = rand()%intVector.size();
     int randIndex1 = intVector[randIntIndex1];
     intVector.erase(intVector.begin() + randIntIndex1);
 
+    // Choose the char and remove it from charVector.
     int randIntIndex2 = rand()%intVector.size();
     int randIndex2 = intVector[randIntIndex2];
     intVector.erase(intVector.begin() + randIntIndex2);
@@ -139,16 +144,22 @@ std::pair<std::pair<int, int>, char> randomChar(std::vector<char>& charVector, s
 void resetTable(){
     srand(time(0));
     table.clear();
+
+    // Reset the game variables.
     remainingCards = 24;
     status = FIRST_PICK;
 
+    // Vector that contains all English uppercase letters.
     std::vector<char> charVector(26);
     std::iota(charVector.begin(), charVector.end(), 'A');
 
+    // Vector that contains integers from 0 to 24.
     std::vector<int> intVector;
     for (int i = 0; i < 24; i++) {
         intVector.push_back(i);
     }
+
+    // Construct the table vector with '0'.
     for (unsigned int i = 0; i < 4; i++) {
         std::vector<char> row;
         table.push_back(row);
@@ -157,6 +168,8 @@ void resetTable(){
         }
     }
 
+    // In each iteration, a char and two distinct integers are obtained from randomChar function.
+    // Then, the char is put into the table vector twice. Index is calculated from the random integers obtained from randomChar function.
     for (int i = 0; i < 12; i++) {
         char letter;
         std::pair<int, int> indexPair;
