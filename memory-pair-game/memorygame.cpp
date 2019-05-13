@@ -2,8 +2,8 @@
 #include "ui_memorygame.h"
 #include <utility>
 #include <numeric>
-#include <ctime>
 #include <QTimer>
+#include <QTest>
 
 enum gameStatus {FIRST_PICK, SECOND_PICK};
 int remainingCards = 24;
@@ -12,7 +12,8 @@ gameStatus status = FIRST_PICK;
 void resetTable();
 QPushButton* firstPickedButton;
 QPushButton *buttons[4][6];
-
+int pairs = 0;
+int tries = 0;
 
 
 memorygame::memorygame(QWidget *parent) :
@@ -56,20 +57,33 @@ void memorygame::buttonClicked(){   // reset butonu hariç bir butona tıklanın
 
         // İki butonun içindeki değeri table'dan bulup karşılaştırıyor. Aynı ise butonları siliyor. Farklı ise butonların textini siliyor, yani kartı kapatıyor.
         if(firstPickedButton->text() == secondPickedLetter && firstPickedButton != button){
+            tries += 1;
+            pairs += 1;
+            ui->lcdNumber->display(tries);
 
+            ui->lcdNumber_2->display(pairs);
             //WAIT
+
             // WAIT icin bunu kullanabiliriz, ama beceremedim. --> QTimer::singleShot(200, this, SLOT(updateCaption()));
             button->setText(secondPickedLetter);
+            QTest::qWait(200);
+
             firstPickedButton->setEnabled(0);
             button->setEnabled(0);
             remainingCards -= 2;
 
+
         }else {
 
+            tries +=1;
+            ui->lcdNumber->display(tries);
+
             button->setText(secondPickedLetter);
-            QTimer::singleShot(1000, []{});
+            QTest::qWait(200);
+            //QTimer::singleShot(1000, []{});
             button->setText("");
             firstPickedButton->setText("");
+
 
         }
         status = FIRST_PICK;
@@ -79,6 +93,11 @@ void memorygame::buttonClicked(){   // reset butonu hariç bir butona tıklanın
 void memorygame::resetClicked(){
 
     resetTable();
+    pairs = 0;
+    tries = 0;
+    ui->lcdNumber->display(tries);
+
+    ui->lcdNumber_2->display(pairs);
 
     // Kartları 3 saniye göster, WAIT.
 
