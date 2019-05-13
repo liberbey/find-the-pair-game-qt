@@ -10,6 +10,7 @@ std::vector< std::vector<char> > table;
 gameStatus status = FIRST_PICK;
 void resetTable();
 QPushButton* firstPickedButton;
+QPushButton *buttons[4][6];
 
 
 
@@ -19,16 +20,15 @@ memorygame::memorygame(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    QPushButton *buttons[4][6]; // Buttonlarin hepsini arraye aiyoruz
     resetTable(); // Global olarak tanimladigim table degiskenini resetliyor, butonlara dokunmuyor.
 
     for(unsigned int i = 0; i < 4; i++){
         for(unsigned int j = 0; j < 6; j++){
             QString buttonName = "pushButton_" + QString::number(i) + QString::number(j); // Butonları ismine göre bulup sonra eşlenen yere koyuyoruz.
-            buttons[i][j] = this->findChild<QPushButton *>(buttonName);  // Eğer buton pushButton_00 ise buttons[0][0] = pushButton_00 olmuş oluyor yani.
-            buttons[i][j]->setText(""); // Başlangıçta tüm butonların içi boş.
-
-            connect(buttons[i][j], SIGNAL(released()), this, SLOT(buttonClicked()));  //tüm butonları aynı fonksiyona bağladım. birine tıklanınca buttonClicked() çalışacak.
+            QPushButton* button = this->findChild<QPushButton *>(buttonName);
+            buttons[i][j] = button;
+            button->setText("");
+            connect(button, SIGNAL(released()), this, SLOT(buttonClicked()));  //tüm butonları aynı fonksiyona bağladım. birine tıklanınca buttonClicked() çalışacak.
         }
     }
 
@@ -76,8 +76,15 @@ void memorygame::buttonClicked(){   // reset butonu hariç bir butona tıklanın
 }
 
 void memorygame::resetClicked(){
-    QPushButton* button = (QPushButton *)sender();
-    button->setText("OK");
+
+    resetTable();
+    for(unsigned int i = 0; i < 4; i++){
+        for(unsigned int j = 0; j < 6; j++){
+            buttons[i][j]->setDisabled(0);
+            buttons[i][j]->setText("");
+        }
+    }
+
 
 }
 
