@@ -2,6 +2,7 @@
 #include "ui_memorygame.h"
 #include <utility>
 #include <numeric>
+#include <ctime>
 #include <QTimer>
 
 enum gameStatus {FIRST_PICK, SECOND_PICK};
