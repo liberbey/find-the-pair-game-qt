@@ -2,6 +2,7 @@
 #include "ui_memorygame.h"
 #include <utility>
 #include <numeric>
+#include <QTimer>
 
 enum gameStatus {FIRST_PICK, SECOND_PICK};
 int remainingCards = 24;
@@ -9,6 +10,7 @@ std::vector< std::vector<char> > table;
 gameStatus status = FIRST_PICK;
 void resetTable();
 QPushButton* firstPickedButton;
+
 
 
 memorygame::memorygame(QWidget *parent) :
@@ -55,15 +57,16 @@ void memorygame::buttonClicked(){   // reset butonu hariç bir butona tıklanın
         if(firstPickedButton->text() == secondPickedLetter && firstPickedButton != button){
 
             //WAIT
-            // WAIT icin bunu kullanabiliriz, ama calistiramadim --> QTimer::singleShot(200, this, SLOT(updateCaption()));
-            firstPickedButton->hide();
-            button->hide();
+            // WAIT icin bunu kullanabiliriz, ama beceremedim. --> QTimer::singleShot(200, this, SLOT(updateCaption()));
+            button->setText(secondPickedLetter);
+            firstPickedButton->setEnabled(0);
+            button->setEnabled(0);
             remainingCards -= 2;
 
         }else {
 
             button->setText(secondPickedLetter);
-            //WAIT
+            QTimer::singleShot(1000, []{});
             button->setText("");
             firstPickedButton->setText("");
 
