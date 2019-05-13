@@ -78,6 +78,9 @@ void memorygame::buttonClicked(){   // reset butonu hariç bir butona tıklanın
 void memorygame::resetClicked(){
 
     resetTable();
+
+    // Kartları 3 saniye göster, WAIT.
+
     for(unsigned int i = 0; i < 4; i++){
         for(unsigned int j = 0; j < 6; j++){
             buttons[i][j]->setDisabled(0);
